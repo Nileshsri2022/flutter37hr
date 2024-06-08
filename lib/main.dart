@@ -24,6 +24,7 @@ void main() async {
       routes: {
         '/login/':(context)=>const LoginView(),
         '/register/':(context)=>const RegisterView(),
+        '/notes/':(context)=>const NotesView(),
       },
     ),
     );
@@ -45,7 +46,7 @@ class HomePage extends StatelessWidget {
             case ConnectionState.done:
               final user = FirebaseAuth.instance.currentUser;
               
-              print(user);
+              devtools.log(user.toString());
               if(user!=null){
                 devtools.log('inside user not null');
                   if(user.emailVerified){

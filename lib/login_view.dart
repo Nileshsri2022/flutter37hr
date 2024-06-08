@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'dart:developer'as devtools show log;
 import 'package:flutter/material.dart';
 
 
@@ -53,19 +53,22 @@ class _LoginViewState extends State<LoginView> {
                  
                 final email=_email.text;
                 final password=_password.text;
-                try{final user=await FirebaseAuth.instance.signInWithEmailAndPassword(
+                try{
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
                   email: email, 
-                  password: password);
-                  print(user);
-                   print(FirebaseAuth.instance.currentUser?.email);
+                  password: password,
+                  );
+                  
+                   Navigator.of(context).pushNamedAndRemoveUntil('/notes/', (routes)=>false,
+                   );
       
                   }
                   on FirebaseAuthException catch (e){
                       if(e.code=='user-not-found'){
-                        print("User not found...");
+                        devtools.log("User not found...");
                       }
                       else if(e.code=='wrong-password'){
-                        print("Wrong password");
+                        devtools.log("Wrong password");
                       }
                   }
                  
