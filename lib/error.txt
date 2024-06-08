@@ -1,0 +1,4 @@
+it is giving null in main.dart beacause you have switch between LoginView() and HomePage() which logout user so it is giving null solved by using hot reload function of flutter extension
+print(FirebaseAuth.instance.currentUser?.email);
+Ticker error which is solved by flutter upgrade it takes time
+Dont stop any process and do proper shutdown
