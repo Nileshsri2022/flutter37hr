@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer'as devtools show log;
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/constants/routes.dart';
+import 'package:flutter_application_1/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -65,11 +65,17 @@ class _LoginViewState extends State<LoginView> {
                   }
                   on FirebaseAuthException catch (e){
                       if(e.code=='user-not-found'){
-                        devtools.log("User not found...");
+                        await showErrorDialog(context, 'User Not Found',);
                       }
                       else if(e.code=='wrong-password'){
-                        devtools.log("Wrong password");
+                        await showErrorDialog(context, 'Wrong Password',);
                       }
+                      else{
+                        await showErrorDialog(context, 'Error: ${e.code}',);
+                      }
+                  }
+                  catch(e){
+                    await showErrorDialog(context, 'Error: ${e.toString()}',);
                   }
                  
                   
@@ -83,5 +89,6 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
+
 // Two types of route anonymous route and names route
 // ex Navgator.of(context).push(MaterialPageRoute(builder:(context)=>VerifyEmailView()));
