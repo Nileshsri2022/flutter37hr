@@ -2,3 +2,10 @@ it is giving null in main.dart beacause you have switch between LoginView() and 
 print(FirebaseAuth.instance.currentUser?.email);
 Ticker error which is solved by flutter upgrade it takes time
 Dont stop any process and do proper shutdown
+
+error: failed to push some refs to 'https://github.com/Nileshsri2022/flutter37hr.git'
+The only alternative to a git pull would be a git push --force and delete .git folder if you want to push to main -> main 
+git tag "step-1"
+git push --tags
+
+
