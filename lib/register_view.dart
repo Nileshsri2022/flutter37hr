@@ -55,10 +55,14 @@ class _RegisterViewState extends State<RegisterView> {
                  
                 final email=_email.text;
                 final password=_password.text;
-                try{final user=await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                try{await FirebaseAuth.instance.createUserWithEmailAndPassword(
                   email: email, 
                   password: password);
-                  devtools.log(user.toString());
+                  // pushNamed is used in top of register view screen so that you can go back to register screen
+                  final user=FirebaseAuth.instance.currentUser;
+                  await user?.sendEmailVerification();
+                  
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
                   }
                   on FirebaseAuthException catch (e){
                     if(e.code=='weak-password'){
@@ -70,7 +74,11 @@ class _RegisterViewState extends State<RegisterView> {
                     else if(e.code=='invalid-email'){
                       await showErrorDialog(context, 'Invalid Email');
                     }
+                    else{
+                      await showErrorDialog(context, 'Error: ${e.code}');
+                    }
                   }
+                  
                   catch(e){
                     await showErrorDialog(context, 'Error: ${e.toString()}');
                   }
