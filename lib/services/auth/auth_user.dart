@@ -10,4 +10,6 @@ class AuthUser {
   // copying the firebase user to AuthUser so that the firebase user is not expose to UI directly
   factory AuthUser.fromFirebase(User user) =>
       AuthUser(isEmailVerified: user.emailVerified);
+      
+      
 }
