@@ -8,4 +8,8 @@ The only alternative to a git pull would be a git push --force and delete .git f
 git tag "step-1"
 git push --tags
 
+notes_view.dart
+You are probably invoking firebase before the app is initialized. All calls to firebase must come after .initializeApp();
+
+
 

@@ -1,9 +1,9 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/constants/routes.dart';
 import 'package:flutter_application_1/enums/menu_actions.dart';
 import 'package:flutter_application_1/services/auth/auth_service.dart';
+import 'package:flutter_application_1/services/crud/notes_service.dart';
+
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
 
@@ -11,8 +11,27 @@ class NotesView extends StatefulWidget {
   State<NotesView> createState() => _NotesViewState();
 }
 
-
 class _NotesViewState extends State<NotesView> {
+  @override
+  void initState() {
+    _notesService = NotesService();
+    // adding _ensureDbIsOpen() in notes_service.dart all call not need here
+    // _notesService.open();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
+
+  // in order to make a call to notes_service.dart to create getOrCreateUser() it needs an email we add email parameter in auth_user.dart
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+  late final NotesService _notesService;
+  // we cannot the read stuff if the database is open
+  // open the database upon creation of NotesView and close it when it is dispose
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +62,29 @@ class _NotesViewState extends State<NotesView> {
           )
         ],
       ),
-      body: const Text('Hello world'),
+      // get current user using his/her email the widget return by FutureBuilder is itself a StreamBuilder
+      // then StreamBuilder calculates all the notes and display
+      body: FutureBuilder(
+        future: _notesService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _notesService.allNotes,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState){
+                    case ConnectionState.waiting:
+                      return const Text('Waiting for all notes...');
+                    default:
+                    return const CircularProgressIndicator();
+                  }
+                },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }
