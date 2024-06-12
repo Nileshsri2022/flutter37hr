@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_application_1/constants/routes.dart';
@@ -130,7 +131,9 @@ class NotesService {
 
     // make sure owner exists in the database with correct id
     final dbUser = await getUser(email: owner.email);
+    print('Database user email:$dbUser');
     if (dbUser != owner) {
+      print('inside dbUser!=owner');
       throw CouldNotFindUser();
     }
     const text = '';
@@ -140,12 +143,14 @@ class NotesService {
       textColumn: text,
       isSyncedWithCloudColumn: 1,
     });
+    print('noteid:$noteId');
     final note = DatabaseNote(
       id: noteId,
       userId: owner.id,
       text: text,
       isSyncedWithCloud: true,
     );
+    print('note$note');
     _notes.add(note);
     _notesStreamController.add(_notes);
     return note;
@@ -163,6 +168,7 @@ class NotesService {
     );
     // either row=0
     if (results.isEmpty) {
+      print('Could not find user');
       throw CouldNotFindUser();
     } else {
       // either match row 1 found
@@ -206,6 +212,8 @@ class NotesService {
 
   Database _getDatabaseOrThrow() {
     final db = _db;
+    print('Database\n');
+    print(db);
     if (db == null) {
       throw DatabaseIsNotOpen();
     } else {
@@ -228,6 +236,7 @@ class NotesService {
       await open();
     } on DatabaseAlreadyOpenException {
 // empty
+print("problem here");
     }
   }
 
@@ -237,8 +246,11 @@ class NotesService {
     }
     try {
       final docsPath = await getApplicationDocumentsDirectory();
+      print('doc path:$docsPath');
       final dbPath = join(docsPath.path, dbName);
+      print('db path:$dbPath');
       final db = await openDatabase(dbPath);
+      print('database: $db');
       _db = db;
       // create user table
       await db.execute(createUserTable);

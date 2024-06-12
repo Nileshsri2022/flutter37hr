@@ -12,6 +12,8 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+  late final NotesService _notesService;
   @override
   void initState() {
     _notesService = NotesService();
@@ -27,8 +29,7 @@ class _NotesViewState extends State<NotesView> {
   }
 
   // in order to make a call to notes_service.dart to create getOrCreateUser() it needs an email we add email parameter in auth_user.dart
-  String get userEmail => AuthService.firebase().currentUser!.email!;
-  late final NotesService _notesService;
+  
   // we cannot the read stuff if the database is open
   // open the database upon creation of NotesView and close it when it is dispose
 
@@ -79,7 +80,9 @@ class _NotesViewState extends State<NotesView> {
                 stream: _notesService.allNotes,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
+                    // implicit fallthrough
                     case ConnectionState.waiting:
+                    case ConnectionState.active:
                       return const Text('Waiting for all notes...');
                     default:
                       return const CircularProgressIndicator();
