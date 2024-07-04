@@ -12,15 +12,16 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  // late means i promise to assign value later before use
-  late final TextEditingController _email;
-  late final TextEditingController _password;
-  @override
+   @override
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
   }
+  // late means i promise to assign value later before use
+  late final TextEditingController _email;
+  late final TextEditingController _password;
+ 
 
   @override
   void dispose() {

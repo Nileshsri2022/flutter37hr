@@ -12,8 +12,6 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
-  String get userEmail => AuthService.firebase().currentUser!.email!;
-  late final NotesService _notesService;
   @override
   void initState() {
     _notesService = NotesService();
@@ -22,14 +20,13 @@ class _NotesViewState extends State<NotesView> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _notesService.close();
-    super.dispose();
-  }
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+  late final NotesService _notesService;
+
+  // remove the dispose
 
   // in order to make a call to notes_service.dart to create getOrCreateUser() it needs an email we add email parameter in auth_user.dart
-  
+
   // we cannot the read stuff if the database is open
   // open the database upon creation of NotesView and close it when it is dispose
 
@@ -83,7 +80,27 @@ class _NotesViewState extends State<NotesView> {
                     // implicit fallthrough
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return const Text('Waiting for all notes...');
+                      print('$snapshot.hasData');
+                      if (snapshot.hasData) {
+                        final allNotes = snapshot.data as List<DatabaseNote>;
+                        return ListView.builder(
+                          itemCount: allNotes.length,
+                          itemBuilder: (context, index) {
+                            final note = allNotes[index];
+                            return ListTile(
+                              title: Text(
+                                note.text,
+                                maxLines: 1,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
+
                     default:
                       return const CircularProgressIndicator();
                   }

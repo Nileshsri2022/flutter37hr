@@ -10,22 +10,30 @@ class NewNoteView extends StatefulWidget {
 }
 
 class _NewNoteViewState extends State<NewNoteView> {
-  DatabaseNote? _note;
-  late final NotesService _notesService;
-  late final TextEditingController _textController;
   @override
   initState() {
     _notesService = NotesService();
     _textController = TextEditingController();
     super.initState();
-
   }
+
+  @override
+  void dispose() {
+    _deleteNoteIfTextIsEmpty();
+    _saveNoteIfTextNotEmpty();
+    _textController.dispose();
+    super.dispose();
+  }
+
+  DatabaseNote? _note;
+  late final NotesService _notesService;
+  late final TextEditingController _textController;
 
   void _textControllerListener() async {
     final note = _note;
     if (note == null) {
       return;
-      }
+    }
     final text = _textController.text;
     await _notesService.updateNote(
       note: note,
@@ -37,24 +45,30 @@ class _NewNoteViewState extends State<NewNoteView> {
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
   }
+
 // step1
   Future<DatabaseNote> createNewNote() async {
+    print('inside createNewNote()');
     final existingNote = _note;
+    print('existing note$existingNote');
     if (existingNote != null) {
       return existingNote;
-    } else {
-      // if currentUser is null then we want app to crash so ! it is safe to use
-      final currentUser = AuthService.firebase().currentUser!;
-      final email = currentUser.email!;
-      final owner = await _notesService.getUser(email: email);
-      return await _notesService.createNote(owner: owner);
     }
+    // if currentUser is null then we want app to crash so ! it is safe to use
+    final currentUser = AuthService.firebase().currentUser!;
+    final email = currentUser.email!;
+    print('Email=>$email');
+    final owner = await _notesService.getUser(email: email);
+    print('Owner=>$owner');
+    final note = await _notesService.createNote(owner: owner);
+    print('note here=>$note');
+    return note;
   }
 
   void _deleteNoteIfTextIsEmpty() async {
     final note = _note;
     if (_textController.text.isEmpty && note != null) {
-      await _notesService.deleteNote(id: note.id);
+       _notesService.deleteNote(id: note.id);
     }
   }
 
@@ -70,14 +84,6 @@ class _NewNoteViewState extends State<NewNoteView> {
   }
 
   @override
-  void dispose() {
-    _deleteNoteIfTextIsEmpty();
-    _saveNoteIfTextNotEmpty();
-    _textController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -88,9 +94,10 @@ class _NewNoteViewState extends State<NewNoteView> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-            if(snapshot.hasData){
-              _note = snapshot.data as DatabaseNote;
-            }
+              // print('Data:$snapshot.data');
+              if (snapshot.hasData) {
+                _note = snapshot.data as DatabaseNote;
+              }
               _setupTextControllerListener();
               return TextField(
                 controller: _textController,

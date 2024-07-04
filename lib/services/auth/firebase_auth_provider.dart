@@ -7,7 +7,13 @@ import 'package:flutter_application_1/services/auth/auth_user.dart';
 import 'package:flutter_application_1/services/auth/auth_exceptions.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
-  
+  // check2
+  @override
+  Future<void> initialize() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   @override
   Future<AuthUser> createUser({
     required String email,
@@ -101,10 +107,5 @@ class FirebaseAuthProvider implements AuthProvider {
     }
   }
   
-  @override
-  Future<void> initialize() async{
-    await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  }
+  
 }
